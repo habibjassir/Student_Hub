@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css">
+  <title>Course Landing Page</title>
+</head>
+
+<body class ="sidebar-collapsed">
+  <!-- Sidebar Menu -->
+  <aside class="sidebar">
+    <div class="logo">
+      Student Hub
+    </div>
+    <nav class="menu">
+      <ul>
+        <li><a>Dashboard</a></li>
+        <li><a>Courses</a></li>
+        <li><a>Profile</a></li>
+        <li><a>Settings</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="search-section">
+        <!-- Button for open/close sidebar-->
+        <button id="sidebarToggle" class="sidebar-toggle">☰</button>
+
+        <input id="searchInput" type="text" placeholder="Search..." class="search-bar" />
+        <button id="searchBtn" class="search-btn">Search</button>
+      </div>
+
+      <div class="filters">
+        <label for="filter">Filter by:</label>
+        <select id="filter">
+          <option value="category">Category</option>
+          <option value="name">Name</option>
+          <option value="status">Status</option>
+        </select>
+
+        <label for="term">Term:</label>
+        <select id="term">
+          <option value="fall">Fall</option>
+          <option value="winter">Winter</option>
+          <option value="spring">Spring</option>
+        </select>
+      </div>
+    </header>
+
+    <!-- Course Table -->
+    <section class="course-list">
+      <div id="tableX">
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#">FAQ</a>
+      <a href="#">Support</a>
+      <a href="#">Contact</a>
+    </div>
+  </footer>
+
+  <script src="logic.js"></script>
+</body>
+
+</html>
