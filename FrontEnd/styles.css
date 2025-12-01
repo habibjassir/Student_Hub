@@ -1,3 +1,20 @@
+/* 
+
+STUDENT HUB STYLE VERSION 1.0.1
+
+AUTHORS: 
+@Sam & @Habib 
+"Functional, we will tune later."
+
+*** IMPORTANT NOTES ****
+- AI help us to draft, code and organize CSS. 
+- CSS Box-Sizing is based on GRID BOX.
+- No images are plan to be load or stored to get 
+best perfromance.
+
+*/
+
+
 /* --------------------------------------------------
    GLOBAL LAYOUT (CSS GRID)
 -------------------------------------------------- */
@@ -223,18 +240,3 @@ table {
   border-radius: 6px;
 }
 
-/* 
-
-STUDENT HUB STYLE VERSION 1.0.1
-
-AUTHORS: 
-@Sam & @Habib 
-"Functional, we will tune later."
-
-*** IMPORTANT NOTES ****
-- AI help us to draft, code and organize CSS. 
-- CSS Box-Sizing is based on GRID BOX.
-- No images are plan to be load or stored to get 
-best perfromance.
-
-*/

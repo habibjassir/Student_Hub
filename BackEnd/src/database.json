@@ -1,0 +1,18 @@
+[
+    {
+      "id": "CPSC-101",
+      "name": "Introduction to Programming",
+      "category": "Computer Science",
+      "status": "Available"
+    },
+    {
+      "id": "MATH-115",
+      "name": "Calculus I",
+      "category": "Mathematics",
+      "status": "Waitlist"
+    }
+  ]
+  
+
+
+
