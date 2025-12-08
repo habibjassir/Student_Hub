@@ -6,10 +6,40 @@
       "status": "Available"
     },
     {
+      "id": "CPSC-250",
+      "name": "Introduction to Computer Architecture",
+      "category": "Computer Science",
+      "status": "Full"
+    },
+    {
+      "id": "CPSC-220",
+      "name": "Introduction to Computer Systems",
+      "category": "Computer Science",
+      "status": "Available"
+    },
+    {
       "id": "MATH-115",
-      "name": "Calculus I",
+      "name": "Discrete Maths I",
       "category": "Mathematics",
       "status": "Waitlist"
+    },
+    {
+      "id": "MATH-215",
+      "name": "Discrete Maths II",
+      "category": "Mathematics",
+      "status": "Available"
+    },
+    {
+      "id": "MATH-232",
+      "name": "Linear Algebra",
+      "category": "Mathematics",
+      "status": "Available"
+    },
+    {
+      "id": "CPSC-276",
+      "name": "Introduction to Software Engineering I",
+      "category": "Computer Science",
+      "status": "Available"
     }
   ]
   

@@ -25,11 +25,13 @@ if (sidebarToggle) {
   });
 }
 
-//Example for Courses Table content loading-status. - @Habib
-const courses = [
-  { name: "CPSC 270", status: "Active" },
-  { name: "Example Course 2", status: "Completed" }
-];
+// Courses will be loaded from the backend
+let courses = [];
+
+// Votes cache (populated from backend)
+let VOTES = {};
+
+// NOTE: Using server-provided `id` field for each course. Removed courseId().
 
 const USER = 
   {
@@ -52,18 +54,35 @@ if (!tableContainer) {
       <tr>
         <th>Course Name</th>
         <th>Status</th>
+        <th>Votes</th>
       </tr>
     </thead>
     <tbody> 
     `;
-  for (let num of courses) {
-    html += `
+    if (!courses || courses.length === 0) {
+      html += `
+        <tr><td colspan="3">No courses available.</td></tr>
+      `;
+    } else {
+      let skipped = 0;
+      for (let num of courses) {
+        if (!num || !num.name) continue; // skip malformed entries
+        // Require server-provided id. If absent, skip the course and count it.
+        const cid = num.id;
+        if (!cid) { skipped++; continue; }
+        html += `
         <tr>
             <td class ="courses" >${num.name}</td>
-            <td class ="status" >${num.status}</td>
+            <td class ="status" >${num.status || ''}</td>
+            <td class="votes-cell">
+               <button class="vote-btn" data-id="${cid}">▲</button>
+               <span id="vote-count-${cid}">${VOTES[cid] || 0}</span>
+            </td>
         </tr>
         `;
-  }
+      }
+      if (skipped > 0) console.warn('loadTable: skipped', skipped, 'courses with no id');
+    }
 
   html += `
         </tbody>
@@ -71,6 +90,63 @@ if (!tableContainer) {
     `;
 
   tableContainer.innerHTML = html;
+
+  // Attach click handlers for vote buttons
+  const buttons = tableContainer.querySelectorAll('.vote-btn');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      const result = await recordVote(id, 1);
+      btn.disabled = false;
+      if (result && result.success && result.data && typeof result.data.votes !== 'undefined') {
+        VOTES[id] = result.data.votes;
+        updateVoteDisplay(id, VOTES[id]);
+      } else {
+        console.error('Vote failed', result && result.error ? result.error : result);
+      }
+    });
+  });
+}
+
+function updateVoteDisplay(id, count) {
+  const el = document.getElementById(`vote-count-${id}`);
+  if (el) el.textContent = String(count);
+}
+
+async function fetchVotes() {
+  try {
+    const resp = await fetch('/votes');
+    if (!resp.ok) return {};
+    const data = await resp.json();
+    VOTES = data || {};
+    return VOTES;
+  } catch (err) {
+    console.error('Failed to fetch votes', err);
+    VOTES = {};
+    return VOTES;
+  }
+}
+
+// Fetch courses from backend
+async function fetchCourses() {
+  try {
+    const resp = await fetch('/courses');
+    if (!resp.ok) {
+      console.error('fetchCourses: server returned', resp.status, resp.statusText);
+      courses = [];
+      return courses;
+    }
+    const data = await resp.json();
+    // Expecting an array of objects with at least `name` and `status` and `id`
+    courses = Array.isArray(data) ? data : [];
+    console.log('fetchCourses: loaded', courses.length, 'courses');
+    return courses;
+  } catch (err) {
+    console.error('Failed to fetch courses', err);
+    courses = [];
+    return courses;
+  }
 }
 
 // get IDs from HTM elements - @Habib
@@ -149,10 +225,46 @@ if (!profileSection) {
   profileSection.innerHTML = html;
 }
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
+  await fetchVotes();
+  await fetchCourses();
   loadTable();            // only does something on index.html
   if (profileSection) {   // only does something on profile.html
     profileLoader();
   }
 });
+
+/*
+  Voting helper
+  - Call `recordVote(id)` from an onclick or event handler.
+  - Example: <button onclick="recordVote('CPSC-101')">Upvote</button>
+  - Sends POST to backend at http://localhost:3000/vote with body { id, delta }
+*/
+async function recordVote(id, delta = 1) {
+  if (!id) throw new Error('recordVote requires an id');
+
+  try {
+    const resp = await fetch('/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, delta })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: 'Unknown error' }));
+      console.error('Vote failed', err);
+      return { success: false, error: err };
+    }
+
+    const data = await resp.json();
+    // return the updated vote count
+    return { success: true, data };
+  } catch (err) {
+    console.error('recordVote error', err);
+    return { success: false, error: err };
+  }
+}
+
+// Expose for usage in inline handlers or other modules
+window.recordVote = recordVote;
 
