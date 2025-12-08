@@ -65,7 +65,7 @@ server.post('/vote', (req, res) => {
     return res.json({ id, votes: votes[id] });
 });
 
-// Optional: GET /votes to return all votes
+// GET /votes to return all votes
 server.get('/votes', (req, res) => {
     try {
         if (!fs.existsSync(VOTES_DB)) return res.json({});
