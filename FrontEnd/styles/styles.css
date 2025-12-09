@@ -240,3 +240,34 @@ table {
   border-radius: 6px;
 }
 
+/* Footer content */
+
+.faq-panel{
+  grid-area: main;
+  padding: 20px;
+
+  /* Innner content centered */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* -------------------------------------
+     RESPONSIVE DESIGN                  
+  -------------------------------------- */
+@media (max-width: 768px) {
+  body {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+  .sidebar {
+    position: absolute;
+    z-index: 1000;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+  }
+  body.sidebar-collapsed .sidebar {
+    transform: translateX(0);
+  }
+} 

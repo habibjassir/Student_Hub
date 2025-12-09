@@ -1,139 +1,89 @@
-# Student Hub — Frontend & Backend Documentation
+# Student Hub — Logic & Server Guide
 
-This document describes the main client and server logic for the Student Hub project:
-- Frontend: `FrontEnd/logic.js`
-- Backend: `BackEnd/src/index.js`
+This file summarizes how the UI logic (`FrontEnd/Logic/logic.js`) and the Express API (`BackEnd/src/index.js`) work together. It also covers the quickest way to run the project locally and how to debug the issues we most often see.
 
-Use this as a quick reference for behavior, endpoints, and integration points.
+## Frontend logic (`FrontEnd/Logic/logic.js`)
 
-**Frontend: `FrontEnd/logic.js`**
+The script runs on every main page (dashboard, FAQ, profile, etc.). Most functions short‑circuit when a required DOM element is missing so that unused features do not crash other pages.
 
-- Purpose: dynamic UI behaviors for the courses page and profile page. Handles loading courses, displaying a table, voting buttons, search, and simple profile rendering.
+### Layout & shared state
+- `sidebarToggle` (click handler) toggles the `sidebar-collapsed` class on `<body>` so navigation can collapse/expand.
+- Global caches: `courses` (array from `/courses`) and `VOTES` (object from `/votes`). Both are refreshed on page load before the UI is rendered.
+- `USER` holds the placeholder profile data shown on the profile page.
 
-Key exported/global items and functions:
+### Course loading & voting workflow
+- `fetchVotes()` pulls `/votes`, stores the object in `VOTES`, and falls back to `{}` on network errors.
+- `fetchCourses()` requests `/courses`, ensures an array is returned, and sets `courses`. Failure paths log the HTTP status or error and return an empty array.
+- `loadTable()` renders the course table into `#tableX` if that container exists. It:
+  - Builds the `<table>` markup.
+  - Skips records that lack a `name` or `id` (logs how many items were skipped).
+  - Shows “No courses available.” when the array is empty.
+  - Attaches click listeners to each `.vote-btn`. The listener calls `recordVote(id, 1)`, disables the button while the request is in flight, and refreshes the vote count using `updateVoteDisplay`.
+- `updateVoteDisplay(id, count)` simply replaces the text inside `#vote-count-${id}`. It is used both by the button handler and by any future live update mechanisms.
+- `recordVote(id, delta = 1)` performs the POST to `/vote` with a JSON body `{ id, delta }`. It returns `{ success, data | error }` so callers can check the success flag without throwing. The function is also exposed globally (`window.recordVote`) for inline handlers.
+- `window.addEventListener('load', ...)` ensures votes and courses are fetched before `loadTable()` runs, and that `profileLoader()` is only called if the profile section exists.
 
-- `window.recordVote(id, delta = 1)`
-  - Sends a POST to `/vote` with JSON `{ id, delta }`.
-  - Returns `{ success: true, data }` on success where `data` contains `{ id, votes }`.
-  - Example usage: `recordVote('CPSC-101', 1).then(res => ...)`.
+### Search, profile, and footer helpers
+- `searchFunction()` reads `#searchInput`, walks `.courses` cells, and hides rows whose names do not contain the typed text. When zero rows match it appends a `.no-results-row` `<tr>` that spans the columns and shows “No courses found,” and removes the row again as soon as a course matches. The click handler is only registered when both the input and button exist.
+- `profileLoader()` fills `#profile-section` with the mock `USER` data. It logs an error if the section is missing (e.g., you opened the dashboard page).
+- Footer interactions (credit @Aysha):
+  - `footerLinks` and `panels` map the three footer buttons to their content panels (`#faq-panel`, `#support-panel`, `#contact-panel`). `hideAllPanels()` collapses them, and each click event shows the requested panel and scrolls to it.
+  - `supportEmailBtn` opens the default mail client with a prefilled subject.
+  - `contactForm` submission is intercepted to avoid a full refresh, show the “sent” message (`#contactSuccess`), and reset the form.
 
-- `fetchCourses()`
-  - Fetches `/courses` and populates the local `courses` array.
-  - Expects backend to return an array of course objects `{ id, name, status, ... }`.
-  - Logs errors and returns an empty array if fetch fails.
+### Future implementations — course filters
+- The interface includes filter controls that will narrow down the table without altering the server payload. `logic.js` now documents a `filterCourses()` helper (currently commented out under “Future implementations”) that demonstrates how to take the cached `courses`, apply field/term filtering, and feed the result back into `loadTable()`. Use that block as the reference when wiring the filter buttons/selects so that the filtered list drives what the table renders.
 
-- `fetchVotes()`
-  - Fetches `/votes` and populates `VOTES` object mapping `id -> count`.
-  - Used to show current vote counts next to each course.
+## Backend server (`BackEnd/src/index.js`)
 
-- `loadTable()`
-  - Renders an HTML table into the element `#tableX`.
-  - For each course in `courses` (skips entries without `name` or `id`) it renders a row:
-    - Course Name (cell with class `.courses`)
-    - Status (cell with class `.status`)
-    - Votes: an upvote button `<button class="vote-btn" data-id="ID">▲</button>` and a `<span id="vote-count-ID">N</span>` showing count.
-  - Adds click handlers to `.vote-btn` buttons which call `recordVote(id, 1)`, update `VOTES`, and call `updateVoteDisplay(id, count)`.
-  - If no courses are returned, displays a fallback row: `No courses available.`
-  - Logs a warning if any course entries are skipped because they lack `id`.
+The backend is a small Express server that serves the frontend files and exposes three JSON endpoints plus one placeholder route.
 
-- `updateVoteDisplay(id, count)`
-  - Updates the DOM element `#vote-count-ID` with the provided count.
+### Data files
+- `BackEnd/src/database.json`: array of course objects `{ id, name, status, ... }`.
+- `BackEnd/src/votes.json`: map whose keys match course `id` values and whose values are vote counts.
+Both files are read synchronously for simplicity. A missing or blank file is treated as empty data.
 
-- Search UI
-  - The search input `#searchInput` and `#searchBtn` work with `searchFunction()` which filters rows by course name (uses `.courses` cells).
+### Middleware and static hosting
+- `express.json()` populates `req.body`.
+- Manual CORS headers allow simple cross‑origin tests (file:// or alternate ports).
+- `express.static(FRONTEND_DIR)` exposes the entire `FrontEnd` folder so opening `http://localhost:3000/index.html` serves the UI straight from the backend.
+- `/login` currently returns `{ message: 'login placeholder' }`. No authentication yet.
 
-- Profile loader
-  - `profileLoader()` renders simple profile fields into `#profile-section` when present.
-
-Important implementation notes
-- The frontend expects each course object from the backend to include a stable `id` field. This `id` is used for DOM ids and vote keys.
-- Fetch endpoints are relative (`/courses`, `/votes`, `/vote`) and assume the frontend is served from the same origin as the backend.
-- If you want file:// testing, you can either allow CORS on the backend or serve the frontend from the backend (recommended).
-
-
-**Backend: `BackEnd/src/index.js`**
-
-- Purpose: simple Express server that serves courses and stores votes in JSON files.
-
-Key files
-- `database.json` — array of course objects. Each course should include `{ id, name, status, category, ... }`.
-- `votes.json` — object mapping course `id` to numeric vote counts, e.g. `{ "CPSC-101": 2 }`.
-
-Key endpoints
-
-- `GET /courses`
-  - Returns the contents of `BackEnd/src/database.json` (array of course objects).
-  - If the file is missing or invalid, returns `[]` or a 500 with an error message.
-
-- `GET /votes`
-  - Returns the contents of `BackEnd/src/votes.json` (object mapping id -> count).
-  - If file missing, returns `{}`.
-
+### API endpoints
 - `POST /vote`
-  - Accepts JSON body `{ id: string, delta: number }`.
-  - Validates `id` and that `delta` is a number. Returns 400 on invalid input.
-  - Reads `votes.json`, updates `votes[id] = (votes[id] || 0) + delta`, writes the file, and returns `{ id, votes: updatedCount }`.
+  - Body: `{ id: string, delta: number }`. Delta is usually `1`, but negatives are accepted for downvotes.
+  - Validates the payload and rejects missing fields with HTTP 400.
+  - Reads `votes.json`, increments the vote count for the matching `id`, persists the file, and returns `{ id, votes: updatedCount }`.
+- `GET /votes`
+  - Returns the parsed contents of `votes.json`, or `{}` when the file is missing/blank.
+  - Any file read error is logged and reported with HTTP 500.
+- `GET /courses`
+  - Returns the parsed contents of `database.json`, or `[]` when the file is missing/blank.
+- Server start
+  - Listening on port `3000` with a log line: `Server is running @Port 3000`.
 
-- Static-serving
-  - Server is configured to serve the `FrontEnd` folder as static files so the UI can be opened at `http://localhost:3000/index.html`.
+## Running Student Hub locally
+1. Install dependencies and start the API/server:
+   ```bash
+   cd BackEnd
+   npm install
+   npm start
+   ```
+2. Once you see “Server is running @Port 3000”, open a browser to `http://localhost:3000/index.html`. The static middleware serves every file under `FrontEnd`, so `dashboard.html`, `profile.html`, etc. work by replacing the filename in the URL.
+3. To develop without restarting the server, edit the JSON data or frontend files and refresh the browser. The backend reads fresh copies of the JSON files on every request, so no restart is needed unless you change server code.
 
-Other server behaviors
-- Simple CORS headers are set to allow development testing (if the frontend is opened from another origin).
-- The server logs file paths for the DB and votes files on startup.
+## Troubleshooting & general bug playbook
+- **No courses are listed**  
+  Confirm `BackEnd/src/database.json` is valid JSON and contains an array with `id` and `name`. Hit `http://localhost:3000/courses` in the browser or with `curl`—if that endpoint fails, the issue is on the server side.
+- **Votes never change**  
+  Make sure the course `id` in `database.json` exactly matches the ID rendered in the DOM (seen in the button’s `data-id`). Also verify `BackEnd/src/votes.json` is writable; delete the file if it becomes corrupted and the server will recreate it.
+- **Buttons or searches throw errors on certain pages**  
+  The logic guards against missing DOM nodes, but if you add new markup ensure the IDs (`sidebarToggle`, `tableX`, `searchInput`, etc.) stay consistent. Open DevTools → Console to check for “Not Found” messages coming from the script.
+- **Server start failures**  
+  Port conflicts and missing packages are the usual culprits. Stop any process already using port 3000 and rerun `npm install` if modules cannot be resolved.
+- **General debugging tips**
+  1. Check browser DevTools → Network tab to see whether `/courses`, `/votes`, and `/vote` succeed and what payloads come back.
+  2. Tail the server output in the terminal; read/write errors for the JSON files are logged with the exact file path.
+  3. Validate JSON files with an online formatter or `node -e "JSON.parse(fs.readFileSync('path'))"` if you suspect trailing commas or syntax issues.
 
-Developer notes & common tasks
-
-- Start server:
-
-```bash
-cd BackEnd
-npm install
-npm start
-```
-
-- View courses via curl:
-
-```bash
-curl -s http://localhost:3000/courses | jq
-```
-
-- View votes via curl:
-
-```bash
-curl -s http://localhost:3000/votes | jq
-```
-
-- If your frontend shows `No courses available.`:
-  - Confirm server is running and `GET /courses` returns the JSON array (see curl above).
-  - Open browser DevTools Console for logs from `fetchCourses()`.
-
-
-Frontend integration examples
-
-- Example course row HTML (generated by `loadTable()`):
-
-```html
-<tr>
-  <td class="courses">Introduction to Programming</td>
-  <td class="status">Available</td>
-  <td class="votes-cell">
-    <button class="vote-btn" data-id="CPSC-101">▲</button>
-    <span id="vote-count-CPSC-101">0</span>
-  </td>
-</tr>
-```
-
-- Example inline button usage (if needed):
-
-```html
-<button onclick="recordVote('CPSC-101', 1)">Upvote</button>
-```
-
-Troubleshooting tips
-- If votes do not show, ensure keys in `votes.json` match the `id` values in `database.json`.
-- If courses are empty, confirm `database.json` is valid JSON and contains an array of course objects with `id` and `name`.
-- When changing `database.json`, restart the backend or re-request `/courses` from the frontend.
-
-
----
-Generated by the project assistant to document `FrontEnd/logic.js` and `BackEnd/src/index.js` behavior.
+Keeping this workflow in mind ensures the frontend (`logic.js`) and backend (`index.js`) stay in sync and makes it straightforward to explain the behavior to teammates or debug issues in the future.

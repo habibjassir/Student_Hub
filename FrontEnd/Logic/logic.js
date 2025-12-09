@@ -25,14 +25,13 @@ if (sidebarToggle) {
   });
 }
 
-// Courses will be loaded from the backend
+// Courses will be loaded from the backend - @Habib
 let courses = [];
 
-// Votes cache (populated from backend)
+// Votes cache (updated from backend) - @Habib
 let VOTES = {};
 
-// NOTE: Using server-provided `id` field for each course. Removed courseId().
-
+// Mock User profile data - @Habib
 const USER = 
   {
   name: "Habib Jassir", 
@@ -40,11 +39,11 @@ const USER =
   program: "Computer Science Diploma"
 }
 
-/* Generating HTML directly in JS to make the Course table dynamic -@Habib */
+// Generating HTML directly in JS to make the Course table dynamic -@Habib
 function loadTable() {
 const tableContainer = document.getElementById("tableX");
 if (!tableContainer) {
-  //not ons the course page, skip
+  //not on the course page? Skip - @Habib
   return
 }
 
@@ -65,11 +64,17 @@ if (!tableContainer) {
       `;
     } else {
       let skipped = 0;
+
       for (let num of courses) {
-        if (!num || !num.name) continue; // skip malformed entries
+        if (!num || !num.name) {
+          continue; // skip malformed entries
+        }
         // Require server-provided id. If absent, skip the course and count it.
         const cid = num.id;
-        if (!cid) { skipped++; continue; }
+        if (!cid) { 
+          skipped++; 
+          continue; 
+        }
         html += `
         <tr>
             <td class ="courses" >${num.name}</td>
@@ -138,6 +143,7 @@ async function fetchCourses() {
       return courses;
     }
     const data = await resp.json();
+    
     // Expecting an array of objects with at least `name` and `status` and `id`
     courses = Array.isArray(data) ? data : [];
     console.log('fetchCourses: loaded', courses.length, 'courses');
@@ -173,9 +179,12 @@ function searchFunction() {
   const table = document.getElementById("table");
   if (!table) {
     console.error("Table Not Found");
+    return;
   }
 
   const items = table.querySelectorAll(".courses");
+  const tbody = table.querySelector("tbody");
+  let matches = 0;
 
   // loop thorugh all course cells - @Habib
   for (let i = 0; i < items.length; i++) {
@@ -186,12 +195,81 @@ function searchFunction() {
     if (textVal.toLowerCase().includes(filter)) {
       //true, then shwo the whole row - @Habib
       items[i].parentElement.style.display = "";
+      matches++;
     } else {
       //false, then hdie the whole row - @Habib
       items[i].parentElement.style.display = "none";
+      
     }
   }
+
+  // Notify user when search returns nothing and prevent JS to crash - @Habib
+  const noResultsClass = "no-results-row";
+  let noResultsRow = table.querySelector(`.${noResultsClass}`);
+
+  // No match? show a notification message - @Habib
+  if (matches === 0) {
+    if (!noResultsRow) {
+      noResultsRow = document.createElement("tr"); // create new row element - @Habib
+      noResultsRow.className = noResultsClass; // style hook to match CSS - @Habib
+      const messageCell = document.createElement("td"); // message lives in a cell - @Habib
+      const columnCount = table.querySelectorAll("thead th").length || 1; // return all <th> inside <thead>, if falsey return 1 - @Habib
+      messageCell.colSpan = columnCount; // ensure message covers entire row - @Habib
+      messageCell.textContent = "No courses found"; // friendly placeholder text - @Habib
+      noResultsRow.appendChild(messageCell); // attach cell to row - @Habib
+    }
+    // make sure the row lives inside the current tbody - @Habib
+    if (tbody && !tbody.contains(noResultsRow)) {
+      tbody.appendChild(noResultsRow);
+    }
+  // At least one match? remove the placeholder if it exists - @Habib
+  } else if (noResultsRow && noResultsRow.parentElement) {
+    noResultsRow.parentElement.removeChild(noResultsRow);
+  }
 }
+
+/* ---------------------- FILTER FUNCITON - @Habib ----------------------
+   Future implementations — course filter buttons
+   ---------------------------------------------------------------*/
+  //  The UI already has placeholder filter controls. When the filter
+  //  buttons/selectors are ready we can activate the workflow below.
+
+  //  function filterCourses(filterField = 'all', filterValue = '', term = 'all') {
+  //    const normalizedField = (filterField || 'all').toLowerCase();
+  //    const normalizedValue = (filterValue || '').trim().toLowerCase();
+  //    const normalizedTerm = (term || 'all').toLowerCase();
+
+  //    const filteredCourses = courses.filter((course) => {
+  //      const matchesField =
+  //        normalizedField === 'all'
+  //          ? true
+  //          : String(course[normalizedField] || '').toLowerCase().includes(normalizedValue);
+
+  //      const matchesTerm =
+  //        normalizedTerm === 'all'
+  //          ? true
+  //          : String(course.term || '').toLowerCase() === normalizedTerm;
+
+  //      return matchesField && matchesTerm;
+  //     });
+  //   }
+  //   console.log('filterCourses: found', filteredCourses.length, 'matching courses'); // debug
+
+     // Future: update loadTable so it can accept a custom list
+     // e.g., loadTable(filteredCourses);
+     // For now we would store `filteredCourses` in a new global and let loadTable()
+     // read from that source.
+
+
+   // Example wiring for buttons or selects:
+   // const filterButtons = document.querySelectorAll('[data-filter-field]');
+   // filterButtons.forEach((btn) => {
+   //   btn.addEventListener('click', () => {
+   //     filterCourses(btn.dataset.filterField, btn.dataset.filterValue, btn.dataset.term);
+   //     loadTable(); // once the filtered list is stored.
+   //   });
+   // });
+/* ------------------------------------------------------------------------------------------------*/
 
 
 /* Event to activate search function.
@@ -268,3 +346,66 @@ async function recordVote(id, delta = 1) {
 // Expose for usage in inline handlers or other modules
 window.recordVote = recordVote;
 
+// ================= FOOTER LOGIC (FAQ / SUPPORT / CONTACT) - @Aysha =================
+
+// Get all footer buttons (FAQ, Support, Contact) - @Aysha
+const footerLinks = document.querySelectorAll(".footer-link");
+
+// Get the 3 panels by their IDs - @Aysha
+const panels = {
+  faq: document.getElementById("faq-panel"),
+  support: document.getElementById("support-panel"),
+  contact: document.getElementById("contact-panel")
+};
+
+// Small helper: hide all panels - @Aysha
+function hideAllPanels() {
+  Object.values(panels).forEach((p) => {
+    if (p) p.classList.add("hidden");  // add 'hidden' class = display: none
+  });
+}
+
+// When user clicks a footer button -> show the correct panel - @Aysha
+footerLinks.forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault(); // stop default button behavior
+
+    const panelName = link.dataset.panel; // 'faq', 'support', or 'contact'
+
+    hideAllPanels(); // hide all panels first
+
+    const selected = panels[panelName]; // choose the panel from the object
+    if (selected) {
+      selected.classList.remove("hidden"); // make that panel visible
+      selected.scrollIntoView({ behavior: "smooth", block: "start" }); // scroll to it
+    }
+  });
+});
+
+// Support email button -> open default mail client - @Aysha
+const supportEmailBtn = document.getElementById("supportEmailBtn");
+if (supportEmailBtn) {
+  supportEmailBtn.addEventListener("click", () => {
+    
+    window.location.href =
+      "mailto:support@studenthub.fake?subject=Student%20Hub%20Support";
+  });
+}
+
+// Contact form (just simulating send) - @Aysha
+const contactForm    = document.getElementById("contactForm");
+const contactSuccess = document.getElementById("contactSuccess");
+
+if (contactForm) {
+  contactForm.addEventListener("submit", (e) => {
+    e.preventDefault(); // prevent page refresh
+
+    
+  
+
+    if (contactSuccess) {
+      contactSuccess.classList.remove("hidden"); // show "sent" message
+    }
+    contactForm.reset(); // clear form inputs
+  });
+}
