@@ -1,3 +1,4 @@
+//Version: 1.0.0
 const express = require("express");
 const fs = require('fs');
 const path = require('path');
@@ -95,4 +96,28 @@ server.get('/courses', (req, res) => {
 server.listen(3000, function run(){
         console.log("Server is running @Port 3000");
 });
+
+
+/* 
+
+@Habib's comments:
+
+Made with Node.js and Express.js
+- Simple backend server for course voting application (Student Hub)
+- Serves static frontend files (from ../FrontEnd)
+- Provides endpoints for login, voting, and fetching course data (endpoints: /login, /vote, /votes, /courses)   
+- Stores data in local JSON files (database.json for courses, votes.json for votes)
+- Includes CORS method for cross-origin requests (feeling fancy!)
+
+
+Future Improvements:
+- Implement real authentication for /login endpoint
+- Add input validation and sanitization (e.g., ensure delta is only 1 or -1)
+- Improve error handling and logging (e.g., use a logging library, provide more detailed error messages)
+- Consider using a real database for scalability (e.g., MongoDB, PostgreSQL)
+- Add limit voting frequency (e.g., one vote per user per course)
+- Implement unit tests for endpoints and functionalities
+- Format date and time for votes (e.g., timestamp each vote)
+- Add loading indicators on frontend during server requests
+*/
 
