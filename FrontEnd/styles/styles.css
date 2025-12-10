@@ -252,6 +252,32 @@ table {
   align-items: center;
 }
 
+.footer-copy {
+  margin-top: 10px;
+  font-size: 12px;
+}
+/*------------------------------------
+      PROFILE SECTION 
+--------------------------------------*/
+.profile-section {
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.502);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  font-size: medium;
+}
+
+.profile-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: 20px;
+  position:relative;
+}
+
 /* -------------------------------------
      RESPONSIVE DESIGN                  
   -------------------------------------- */

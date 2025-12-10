@@ -1,0 +1,15 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Preliminar version of StudentHub",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "author": "Habib Jassir",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

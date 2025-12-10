@@ -32,12 +32,12 @@ let courses = [];
 let VOTES = {};
 
 //  Mock User profile data - @Habib
-// const USER = 
-//   {
-//   name: "Habib Jassir", 
-//   studentId: "10133785", 
-//   program: "Computer Science Diploma"
-// }
+const USER = 
+  {
+  name: "Habib Jassir", 
+  studentId: "10133785", 
+  program: "Computer Science Diploma"
+}
 
 // Generating HTML directly in JS to make the Course table dynamic -@Habib
 function loadTable() {
@@ -410,7 +410,7 @@ if (contactForm) {
   });
 }
 
-//Edit Account Settings Logic 
+//Edit Account Settings Logic - @Sam 
 
 const editBtn = document.getElementById("edit-account-button");
 const editSection = document.getElementById("edit-section");
