@@ -257,17 +257,32 @@ table {
   -------------------------------------- */
 @media (max-width: 768px) {
   body {
-    grid-template-columns: 0 minmax(0, 1fr);
+    grid-template-columns: 220px minmax(0, 1fr);
   }
   .sidebar {
-    position: absolute;
+    width: 200px;
+    position: fixed;
     z-index: 1000;
-    height: 100%;
+    height: 100vh;
     top: 0;
     left: 0;
-    transform: translateX(-100%);
+    transform: translateX(0);
   }
-  body.sidebar-collapsed .sidebar {
-    transform: translateX(-100%);
-  }
+  .logo{
+  font-size: 30px;
+}
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+}
+
+  .menu li {
+  margin-bottom:50px;
+  list-style: none;
+}
+
+body.sidebar-collapsed .sidebar {
+  transform: translateX(-100%);
+}
 } 
