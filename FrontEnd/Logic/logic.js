@@ -31,13 +31,13 @@ let courses = [];
 // Votes cache (updated from backend) - @Habib
 let VOTES = {};
 
-// Mock User profile data - @Habib
-const USER = 
-  {
-  name: "Habib Jassir", 
-  studentId: "10133785", 
-  program: "Computer Science Diploma"
-}
+//  Mock User profile data - @Habib
+// const USER = 
+//   {
+//   name: "Habib Jassir", 
+//   studentId: "10133785", 
+//   program: "Computer Science Diploma"
+// }
 
 // Generating HTML directly in JS to make the Course table dynamic -@Habib
 function loadTable() {
@@ -409,3 +409,22 @@ if (contactForm) {
     contactForm.reset(); // clear form inputs
   });
 }
+
+//Edit Account Settings Logic 
+
+const editBtn = document.getElementById("edit-account-button");
+const editSection = document.getElementById("edit-section");
+if (editBtn && editSection) {
+  editBtn.addEventListener("click", () => {
+    if (editSection.style.display === "none" || editSection.style.display === "") {
+      editSection.style.display = "block";
+      editBtn.textContent = "Close Account Settings";
+    } else {
+      editSection.style.display = "none";
+      editBtn.textContent = "Edit Account Settings";
+    }
+  });
+}
+
+
+
