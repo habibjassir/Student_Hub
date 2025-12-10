@@ -1,4 +1,4 @@
-# Student Hub — Logic & Server Guide
+# Student Hub — Logic & Server Guide 
 
 This file summarizes how the UI logic (`FrontEnd/Logic/logic.js`) and the Express API (`BackEnd/src/index.js`) work together. It also covers the quickest way to run the project locally and how to debug the issues we most often see.
 
@@ -87,9 +87,12 @@ Both files are read synchronously for simplicity. A missing or blank file is tre
   The logic guards against missing DOM nodes, but if you add new markup ensure the IDs (`sidebarToggle`, `tableX`, `searchInput`, etc.) stay consistent. Open DevTools → Console to check for “Not Found” messages coming from the script.
 - **Server start failures**  
   Port conflicts and missing packages are the usual culprits. Stop any process already using port 3000 and rerun `npm install` if modules cannot be resolved.
-- **General debugging tips**
+- **General debugging**
   1. Check browser DevTools → Network tab to see whether `/courses`, `/votes`, and `/vote` succeed and what payloads come back.
   2. Tail the server output in the terminal; read/write errors for the JSON files are logged with the exact file path.
   3. Validate JSON files with an online formatter or `node -e "JSON.parse(fs.readFileSync('path'))"` if you suspect trailing commas or syntax issues.
 
 Keeping this workflow in mind ensures the frontend (`logic.js`) and backend (`index.js`) stay in sync and makes it straightforward to explain the behavior to teammates or debug issues in the future.
+
+/*This Documentation was made with AI tools to help us spot any undocumented component*/
+
