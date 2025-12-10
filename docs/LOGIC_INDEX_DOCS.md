@@ -9,6 +9,7 @@ The script runs on every main page (dashboard, FAQ, profile, etc.). Most functio
 ### Layout & shared state
 - `sidebarToggle` (click handler) toggles the `sidebar-collapsed` class on `<body>` so navigation can collapse/expand.
 - Global caches: `courses` (array from `/courses`) and `VOTES` (object from `/votes`). Both are refreshed on page load before the UI is rendered.
+- `LOCAL_VOTE_KEY`, `LOCAL_VOTES`, `loadLocalVotes()`, and `saveLocalVotes()` mirror the vote history inside `localStorage`. They let the browser remember which course IDs were already voted for even after a refresh.
 - `USER` holds the placeholder profile data shown on the profile page.
 
 ### Course loading & voting workflow
@@ -22,6 +23,11 @@ The script runs on every main page (dashboard, FAQ, profile, etc.). Most functio
 - `updateVoteDisplay(id, count)` simply replaces the text inside `#vote-count-${id}`. It is used both by the button handler and by any future live update mechanisms.
 - `recordVote(id, delta = 1)` performs the POST to `/vote` with a JSON body `{ id, delta }`. It returns `{ success, data | error }` so callers can check the success flag without throwing. The function is also exposed globally (`window.recordVote`) for inline handlers.
 - `window.addEventListener('load', ...)` ensures votes and courses are fetched before `loadTable()` runs, and that `profileLoader()` is only called if the profile section exists.
+
+### Client-side one-vote limit
+- `hasLocalVote(id)` and `markLocalVote(id)` consult and update `LOCAL_VOTES`. They provide a simple “already voted” check without needing authentication.
+- During table rendering every `.vote-btn` is disabled up front when `hasLocalVote()` returns `true`, so a refreshed page still shows the lockout.
+- When a button is clicked the handler exits early with an alert if `hasLocalVote()` is true, otherwise it proceeds to `recordVote()`. A successful response triggers `markLocalVote(id)` and leaves the button disabled. A failed response re-enables the button so the user can retry.
 
 ### Search, profile, and footer helpers
 - `searchFunction()` reads `#searchInput`, walks `.courses` cells, and hides rows whose names do not contain the typed text. When zero rows match it appends a `.no-results-row` `<tr>` that spans the columns and shows “No courses found,” and removes the row again as soon as a course matches. The click handler is only registered when both the input and button exist.
