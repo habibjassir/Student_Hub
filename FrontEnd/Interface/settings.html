@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/styles/styles.css">
+  <title>Settings</title>
+</head>
+
+
+<!--body class="sidebar-collapsed">
+
+  <!-- Sidebar Menu -->
+  <aside class="sidebar">
+    <div class="logo">
+      Student Hub
+    </div>
+    <nav class="menu">
+      <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="index.html">Courses</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="settings.html">Settings</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="search-section">
+           <!-- Button for open/close sidebar-->
+          <button id="sidebarToggle" class="sidebar-toggle">☰</button>
+        <h1>Settings</h1>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <section class="course-list">
+      
+        <!--Account Settings-->
+      <section>
+        <h2>Account Settings</h2>
+        <p><strong> Name: </strong> Samrawit Meaza</p>
+        <p><strong> Email: </strong> samrawitephrem17@gmail.com</p>
+        <p><strong> Password: </strong> ************</p>
+        
+        
+        <!--button to toggle the edit section-->
+          <p>
+        <button id="edit-account-button" type="button"> Edit Account Settings </button>
+          </p>
+
+        <!--Hidden section to edit account info-->
+
+          <div id= "edit-section" style="display:none;">
+            <label for="edit-name">Name:</label>
+            <input type="text" id="edit-name" name="name" value="Samrawit Meaza"></input>
+            <br ><br>
+            <label for="edit-email">Email:</label>
+            <input type="email" id="edit-email" name="email" value="samrawitephrem17@gmail.com"></input>
+            <br ><br>
+            <label for="edit-password">Password:</label>
+            <input type="password" id="edit-password" name="password"></input>
+            <br ><br>   
+            <button id="save-changes-button" type="button"> Save Changes </button>
+          </div>
+      </section>
+      <hr>
+
+      <!--Display Preferences-->
+      <section>
+       <h2> Display Prefrences</h2>
+       <label for="coursesPerPage">Courses per page:</label>
+      <select id="coursesPerPage" name="coursesPerPage">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+      </select>
+      <br><br>
+      <label for="theme">Theme:</label>
+      <select id="theme" name="theme">
+        <option value="light">Light</option>
+        <option value="dark">Dark (coming soon)</option>
+      </select>
+    </section>
+     <hr> 
+
+      <!--Privacy Settings-->
+      <section>
+    <Privacy Settings>
+      <h2>Privacy Settings</h2>
+      <label>
+        <input type="checkbox" name="advisor_access">
+        Allow my advisor to view a summary of my course votes
+      </label>
+      <p>
+        <small>
+        This does not share your personal information, only which courses you voted for.
+      </small>
+    </p>
+    </section>
+      
+    </section>
+
+  </main>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/Interface/faq.html">FAQ</a>
+      <a href="/Interface/faq.html">Support</a>
+      <a href="/Interface/faq.html">Contact</a>
+    </div>
+  </footer>
+
+  <script src="/Logic/logic.js"></script>
+</body>
+
+</html>

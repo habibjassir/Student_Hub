@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/styles/styles.css">
+  <title>FAQ</title>
+</head>
+<body class=" sidebar-collapsed">
+
+  <!-- Sidebar Menu -->
+  <aside class="sidebar">
+    <div class="logo">
+      Student Hub
+    </div>
+    <nav class="menu">
+      <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="index.html">Courses</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="settings.html">Settings</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="search-section">
+           <!-- Button for open/close sidebar-->
+          <button id="sidebarToggle" class="sidebar-toggle">☰</button>
+
+        </div>
+      </header>
+      
+     <!-- Footer panels (shown/hidden by logic.js) -->
+  <section class="footer-panels">
+    <!-- FAQ PANEL -->
+    <div id="faq-panel" class="panel hidden">
+      <h2>Frequently Asked Questions</h2>
+      <ul>
+        <li>
+          <strong>How do I search for a course?</strong><br>
+          Use the search bar at the top and type part of the course name, then click <em>Search</em>.
+        </li>
+        <li>
+          <strong>What does "Filter by" do?</strong><br>
+          It changes whether your search text matches the course <em>Name</em>, <em>Category</em>, or <em>Status</em>.
+        </li>
+        <li>
+          <strong>How do I filter by term?</strong><br>
+          Select a term from the <em>Term</em> dropdown (Fall, Winter, Spring). Only courses from that term will show.
+        </li>
+      </ul>
+    </div>
+
+    <!-- SUPPORT PANEL -->
+    <div id="support-panel" class="panel hidden">
+      <h2>Support</h2>
+      <p>If the page is not working correctly, try:</p>
+      <ol>
+        <li>Refreshing the page.</li>
+        <li>Trying a different browser.</li>
+        <li>Checking your internet connection.</li>
+      </ol>
+      <p>If the problem continues, click below to contact technical support:</p>
+      <button id="supportEmailBtn" class="primary-btn">
+        Email Technical Support
+      </button>
+    </div>
+
+    <!-- CONTACT PANEL -->
+    <div id="contact-panel" class="panel hidden">
+      <h2>Contact Us</h2>
+      <form id="contactForm" class="contact-form">
+        <label>
+          Name
+          <input type="text" id="contactName" required>
+        </label>
+        <label>
+          Email
+          <input type="email" id="contactEmail" required>
+        </label>
+        <label>
+          Message
+          <textarea id="contactMessage" rows="3" required></textarea>
+        </label>
+        <button type="submit" class="primary-btn">Send</button>
+        <p id="contactSuccess" class="success-msg hidden">
+          Thanks! Your message has been sent (simulated).
+        </p>
+      </form>
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/Interface/faq.html">FAQ</a>
+      <a href="/Interface/faq.html">Support</a>
+      <a href="/Interface/faq.html">Contact</a>
+    </div>
+  </footer>
+
+  <script src="/Logic/logic.js"></script>
+</html>
