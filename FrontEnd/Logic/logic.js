@@ -31,6 +31,41 @@ let courses = [];
 // Votes cache (updated from backend) - @Habib
 let VOTES = {};
 
+// Track which courses were voted for on this device via localStorage - @Habib
+const LOCAL_VOTE_KEY = "studentHubVotes";
+let LOCAL_VOTES = loadLocalVotes();
+
+function loadLocalVotes() {
+  if (typeof window === "undefined" || !window.localStorage) return {};
+  try {
+    const raw = window.localStorage.getItem(LOCAL_VOTE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    console.warn("loadLocalVotes failed", err);
+    return {};
+  }
+}
+
+function saveLocalVotes() {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  try {
+    window.localStorage.setItem(LOCAL_VOTE_KEY, JSON.stringify(LOCAL_VOTES));
+  } catch (err) {
+    console.warn("saveLocalVotes failed", err);
+  }
+}
+
+function hasLocalVote(id) {
+  return Boolean(id && LOCAL_VOTES[id]);
+}
+
+function markLocalVote(id) {
+  if (!id) return;
+  LOCAL_VOTES[id] = true;
+  saveLocalVotes();
+}
+
 //  Mock User profile data - @Habib
 const USER = 
   {
@@ -99,16 +134,25 @@ if (!tableContainer) {
   // Attach click handlers for vote buttons
   const buttons = tableContainer.querySelectorAll('.vote-btn');
   buttons.forEach((btn) => {
+    if (hasLocalVote(btn.dataset.id)) {
+      btn.disabled = true; // already voted once on this device
+    }
     btn.addEventListener('click', async (e) => {
       const id = btn.dataset.id;
+      if (hasLocalVote(id)) {
+        alert('You already voted for this course on this device.');
+        return;
+      }
       btn.disabled = true;
       const result = await recordVote(id, 1);
-      btn.disabled = false;
       if (result && result.success && result.data && typeof result.data.votes !== 'undefined') {
         VOTES[id] = result.data.votes;
         updateVoteDisplay(id, VOTES[id]);
+        markLocalVote(id);
+        btn.disabled = true; // keep disabled after successful vote
       } else {
         console.error('Vote failed', result && result.error ? result.error : result);
+        btn.disabled = false; // allow retry if backend failed
       }
     });
   });
@@ -425,6 +469,3 @@ if (editBtn && editSection) {
     }
   });
 }
-
-
-
